@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -13,49 +12,47 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 
 // 1. Importando nosso schema e o tipo
-import { signInSchema, type SignInSchema } from "@/schemas/sign-in-schema";
-import { signIn } from "@/lib/auth-client";
-import { Google } from "iconsax-reactjs";
+import { signUpSchema, type SignUpSchema } from "@/schemas/sign-up-schema";
+import { signUp, authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { Github } from "lucide-react";
 import Link from "next/link";
 
 export function SignUpForm() {
-    const { theme } = useTheme()
-
     // 2. Definindo o formulário com useForm
-    const form = useForm<SignInSchema>({
-        resolver: zodResolver(signInSchema),
+    const form = useForm<SignUpSchema>({
+        resolver: zodResolver(signUpSchema),
         defaultValues: {
+            name: "",
             email: "",
             password: "",
-            keepMeSignedIn: false,
+            confirmPassword: "",
         },
     });
 
     // 3. Função para lidar com o submit
-    async function onSubmit(values: SignInSchema) {
+    async function onSubmit(values: SignUpSchema) {
         try {
-            const { data, error } = await signIn.email({
+            const { data, error } = await signUp.email({
                 email: values.email,
                 password: values.password,
-                callbackURL: "/dashboard", // Redireciona após login
+                name: values.name,
             });
 
             if (error) {
-                // Tratar erro (email/senha incorretos, etc.)
-                console.error("Erro ao fazer login:", error);
+                // Tratar erro (email já existe, etc.)
+                console.error("Erro ao criar conta:", error);
                 form.setError("root", {
-                    message: error.message || "Erro ao fazer login. Verifique suas credenciais.",
+                    message: error.message || "Erro ao criar conta. Tente novamente.",
                 });
                 return;
             }
 
-            // Login bem-sucedido
-            console.log("Login bem-sucedido:", data);
+            // Registro bem-sucedido - redirecionar para dashboard
+            console.log("Conta criada com sucesso:", data);
+            window.location.href = "/dashboard";
         } catch (err) {
             console.error("Erro inesperado:", err);
             form.setError("root", {
@@ -66,11 +63,28 @@ export function SignUpForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">
-                {/* Campo de E-mail */}
-                <h1 className="text-5xl">Wellcome</h1>
-                <p className="opacity-50">Access your account and continue your journey with us</p>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Título */}
+                <h1 className="text-5xl">Create Account</h1>
+                <p className="opacity-50">Join us and start your journey today</p>
                 <p></p>
+
+                {/* Campo de Nome */}
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="opacity-50">Full Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter your full name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {/* Campo de E-mail */}
                 <FormField
                     control={form.control}
                     name="email"
@@ -93,30 +107,24 @@ export function SignUpForm() {
                         <FormItem>
                             <FormLabel className="opacity-50">Password</FormLabel>
                             <FormControl>
-                                <Input type="password" placeholder="Enter your password" {...field} />
+                                <Input type="password" placeholder="Create a password (min. 8 characters)" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
 
-                {/* Campo do Checkbox */}
+                {/* Campo de Confirmar Senha */}
                 <FormField
                     control={form.control}
-                    name="keepMeSignedIn"
+                    name="confirmPassword"
                     render={({ field }) => (
-                        <FormItem className="flex flex-row items-center">
+                        <FormItem>
+                            <FormLabel className="opacity-50">Confirm Password</FormLabel>
                             <FormControl>
-                                <Checkbox
-                                    className="rounded-full"
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
+                                <Input type="password" placeholder="Confirm your password" {...field} />
                             </FormControl>
-                            <div className="flex justify-between w-full items-center">
-                                <FormLabel className="font-normal">Keep me signed in</FormLabel>
-                                <Button variant={'link'} className="font-normal">Reset password</Button>
-                            </div>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -129,10 +137,10 @@ export function SignUpForm() {
                 )}
 
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting ? "Signing in..." : "Sign In"}
+                    {form.formState.isSubmitting ? "Creating account..." : "Create Account"}
                 </Button>
 
-                <div className="flex gap-2 items-center ">
+                <div className="flex gap-2 items-center">
                     <div className="w-full h-[1px] bg-primary opacity-50"></div>
                     <p className="w-full opacity-70">Or continue with</p>
                     <div className="w-full h-[1px] bg-primary opacity-50"></div>
@@ -142,7 +150,7 @@ export function SignUpForm() {
                         variant='outline'
                         className="w-full"
                         type="button"
-                        onClick={() => signIn.social({ provider: "google", callbackURL: "/dashboard" })}
+                        onClick={() => authClient.signIn.social({ provider: "google", callbackURL: "/dashboard" })}
                     >
                         <Image alt='google logo' width={16} height={16} src='https://cdn.brandfetch.io/id6O2oGzv-/theme/dark/symbol.svg?c=1bxid64Mup7aczewSAYMX&t=1755835725776' /> Continue with Google
                     </Button>
@@ -150,15 +158,15 @@ export function SignUpForm() {
                         variant='outline'
                         className="w-full"
                         type="button"
-                        onClick={() => signIn.social({ provider: "github", callbackURL: "/dashboard" })}
+                        onClick={() => authClient.signIn.social({ provider: "github", callbackURL: "/dashboard" })}
                     >
                         <Github />
                         Continue with GitHub
                     </Button>
                 </div>
                 <div className="flex w-full items-center justify-center gap-0">
-                    <p className="opacity-70">New to our platform?</p>
-                    <Link href={'/signUp'} className="font-normal p-2 text-purple-300">Create Account</Link>
+                    <p className="opacity-70">Already have an account?</p>
+                    <Link href={'/signIn'} className="font-normal p-2 text-purple-300">Sign In</Link>
                 </div>
             </form>
         </Form>
