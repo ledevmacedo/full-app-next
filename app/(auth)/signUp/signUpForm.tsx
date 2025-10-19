@@ -23,7 +23,7 @@ import Image from "next/image";
 import { Github } from "lucide-react";
 import Link from "next/link";
 
-export function SignInForm() {
+export function SignUpForm() {
     const { theme } = useTheme()
 
     // 2. Definindo o formulário com useForm
