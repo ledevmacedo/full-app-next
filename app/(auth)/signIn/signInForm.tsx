@@ -20,6 +20,7 @@ import { signInSchema, type SignInSchema } from "@/schemas/sign-in-schema";
 import { Google } from "iconsax-reactjs";
 import Image from "next/image";
 import { Github } from "lucide-react";
+import Link from "next/link";
 
 export function SignInForm() {
     const { theme } = useTheme()
@@ -115,6 +116,10 @@ export function SignInForm() {
                         <Github />
                         Continue with GitHub
                     </Button>
+                </div>
+                <div className="flex w-full items-center justify-center gap-0">
+                    <p className="opacity-70">New to our platform?</p>
+                    <Link href={'/signUp'} className="font-normal p-2 text-purple-300">Create Account</Link>
                 </div>
             </form>
         </Form>
