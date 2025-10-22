@@ -10,7 +10,6 @@ import {
     closeAlert,
 } from "@/store/slices/alertSlice";
 import { Button } from "@/components/ui/button"
-import { GlobalDialog } from "@/features/dialogs"
 import { CodeBlock, CodeBlockCode, CodeBlockGroup } from "@/components/ui/code-block"
 import { ModeToggle } from "@/components/ui/mode-toggle"
 import { Check, Copy } from "lucide-react"
@@ -154,8 +153,7 @@ export default function DialogsPage() {
                 </div>
             </div>
 
-            {/* Monta o dialog para visualização */}
-            <GlobalDialog />
+
         </div>
     )
 }

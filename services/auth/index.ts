@@ -1,4 +1,3 @@
-// Auth types will be defined here
 export interface AuthCredentials {
   email: string;
   password: string;

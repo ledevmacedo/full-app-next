@@ -1,5 +1,6 @@
+import type { AuthCredentials, AuthResponse } from './index';
 import { globalInstance } from "@/lib/api";
-import type { AuthCredentials, AuthResponse } from "../types";
+
 
 export const authService = {
   login: async (credentials: AuthCredentials): Promise<AuthResponse> => {

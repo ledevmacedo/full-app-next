@@ -5,6 +5,8 @@ import { ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
 import { Provider } from "react-redux"
 import { store } from "@/store";
+import { GlobalDialog } from "@/components/global/GlobalDialog";
+
 
 export function Providers({ children }: { children: ReactNode }) {
     return <>
@@ -15,6 +17,7 @@ export function Providers({ children }: { children: ReactNode }) {
                 enableSystem
                 disableTransitionOnChange
             >
+                <GlobalDialog />
                 {children}
             </ThemeProvider>
         </Provider>
