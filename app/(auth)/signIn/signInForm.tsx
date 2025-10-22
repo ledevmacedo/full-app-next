@@ -68,7 +68,7 @@ export function SignInForm() {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">
                 {/* Campo de E-mail */}
-                <h1 className="text-5xl">Wellcome</h1>
+                <h1 className="text-5xl animate-element animate-delay-100">Wellcome</h1>
                 <p className="opacity-50">Access your account and continue your journey with us</p>
                 <p></p>
                 <FormField
